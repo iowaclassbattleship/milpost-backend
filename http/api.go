@@ -40,14 +40,12 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 
 // CreatePostEntry creates a new entry in the database and returns an id
 func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(buildResponse())
+	w.WriteHeader(http.StatusInternalServerError)
 }
 
 // DeletePostEntry deletes an entry in the database
 func DeletePostEntry(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(buildResponse())
+	http.StatusText(200)
 }
 
 // GetLandingPage returns a html file welcoming the user
