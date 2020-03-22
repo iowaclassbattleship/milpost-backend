@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"milpost.ch/api"
+	api "milpost.ch/http"
 )
 
 type environment struct {
