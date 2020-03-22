@@ -2,7 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"path"
+	"text/template"
 )
 
 type post struct {
@@ -33,4 +36,13 @@ func buildResponse() []byte {
 func ViewHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(buildResponse())
+}
+
+// WelcomeHandler does
+func WelcomeHandler(w http.ResponseWriter, r *http.Request) {
+	fp := path.Join("templates", "index.html")
+	tmpl, err := template.ParseFiles(fp)
+	ErrorHandler(err)
+
+	fmt.Print(tmpl)
 }
