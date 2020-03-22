@@ -2,9 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"path"
 	"text/template"
 )
 
@@ -40,9 +38,10 @@ func ViewHandler(w http.ResponseWriter, r *http.Request) {
 
 // WelcomeHandler does
 func WelcomeHandler(w http.ResponseWriter, r *http.Request) {
-	fp := path.Join("templates", "index.html")
-	tmpl, err := template.ParseFiles(fp)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	t, err := template.ParseFiles("./templates/index.html")
 	ErrorHandler(err)
 
-	fmt.Print(tmpl)
+	t.Execute(w, nil)
 }
