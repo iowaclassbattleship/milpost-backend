@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -15,6 +16,7 @@ type environment struct {
 
 func main() {
 	env := readEnvironment()
+	fmt.Println("Server listening on Port", env.Port)
 
 	api.HandleHTTP(env.Port, env.URI)
 }
