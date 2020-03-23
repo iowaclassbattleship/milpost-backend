@@ -1,0 +1,9 @@
+FROM mongo:3.6
+
+VOLUME ["/data/db"]
+WORKDIR /data
+
+EXPOSE 27017
+
+CMD ["mongodb"]
+
