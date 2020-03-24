@@ -18,7 +18,7 @@ can be found and the requirements for this project
 This section will outline the steps to deploy the api and mongo database. Both
 use a seperate docker file as specified in the `Dockerfile.api` and
 `Dockerfile.db` for the api and database (mongo) respectivielty. To be able to
-deploy this you must have docker installed, find the tutorial to install it 
+deploy this you must have docker installed, find the tutorial to install it
 [here](https://docs.docker.com/install/linux/docker-ce/debian/).
 
 ### Building and running api docker
@@ -120,7 +120,8 @@ The admin users should be able to:
 
 Ideally there are two possible print outs for the `post list`, one to display
 and one to be used by the admin to collect signatures from the recievers. The
-minimum columns for the admin listhttps://docs.docker.com/install/linux/docker-ce/debian/
+minimum columns for the admin list are as follows.
+
 - Rank
 - Name
 - Signature (To be filled in)
