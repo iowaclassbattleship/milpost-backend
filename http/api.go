@@ -51,14 +51,21 @@ func buildResponse() []byte {
 	return js
 }
 
+func setupResponse(w *http.ResponseWriter, req *http.Request) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
 func Login(w http.ResponseWriter, r *http.Request) {
 	authorization := r.Header.Get("Authorization")
 	fmt.Println(authorization)
+	http.Error(w, "authorization failed", http.StatusUnauthorized)
 }
 
 // GetPost returns all entries
 func GetPost(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setupResponse(&w, r)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(buildResponse())
 }
