@@ -2,34 +2,58 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"text/template"
+	"time"
 )
 
+type envelope struct {
+	Result result `json:"result"`
+}
+
+type result struct {
+	Meta meta   `json:"meta"`
+	Data []post `json:"post"`
+}
+
+type meta struct {
+	StatusCode int       `json:"statusCode"`
+	Time       time.Time `json:"time"`
+}
+
 type post struct {
-	ID           int
-	Company      string
-	Section      string
-	Rank         string
-	Name         string
-	DeliveryType int
-	Timestamp    string
+	ID        int    `json:"id"`
+	Company   string `json:"company"`
+	Section   string `json:"section"`
+	Grade     string `json:"grade"`
+	Name      string `json:"name"`
+	ItemType  int    `json:"itemType"`
+	Timestamp string `json:"timeStamp"`
 }
 
 func buildResponse() []byte {
-	response := post{
-		1,
-		"Charlie",
-		"Ambos",
-		"General",
-		"Fishman",
-		2,
-		"2019-04-03"}
+	var response []post
+	for i := 0; i < 5; i++ {
+		response = append(response, post{
+			1,
+			"Charlie",
+			"Ambos",
+			"General",
+			"Fishman",
+			2,
+			"2019-04-03"})
+	}
 
-	js, err := json.Marshal(response)
+	js, err := json.Marshal(buildResponseEnvelope(response))
 	ErrorHandler(err)
 
 	return js
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	authorization := r.Header.Get("Authorization")
+	fmt.Println(authorization)
 }
 
 // GetPost returns all entries
@@ -45,7 +69,7 @@ func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
 
 // DeletePostEntry deletes an entry in the database
 func DeletePostEntry(w http.ResponseWriter, r *http.Request) {
-	http.StatusText(200)
+	http.StatusText(404)
 }
 
 // GetLandingPage returns a html file welcoming the user
@@ -56,4 +80,8 @@ func GetLandingPage(w http.ResponseWriter, r *http.Request) {
 	ErrorHandler(err)
 
 	t.Execute(w, nil)
+}
+
+func buildResponseEnvelope(response []post) envelope {
+	return envelope{result{meta{200, time.Now()}, response}}
 }

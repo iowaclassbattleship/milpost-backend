@@ -3,15 +3,15 @@ package api
 import (
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
 // HandleHTTP Function
-func HandleHTTP(port int, uri string) {
+func HandleHTTP(port string) {
 	router := mux.NewRouter().StrictSlash(true)
 
+	router.HandleFunc("/login", Login).Methods("POST")
 	router.HandleFunc("/post", GetPost).Methods("GET")
 
 	router.HandleFunc("/post/{id}", CreatePostEntry).Methods("POST")
@@ -19,5 +19,5 @@ func HandleHTTP(port int, uri string) {
 
 	router.HandleFunc("/", GetLandingPage).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
