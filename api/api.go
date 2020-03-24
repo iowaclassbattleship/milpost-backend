@@ -2,10 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"text/template"
 	"time"
+
+	errorhandler "milpost.ch/errorhandler"
 )
 
 type envelope struct {
@@ -46,26 +47,13 @@ func buildResponse() []byte {
 	}
 
 	js, err := json.Marshal(buildResponseEnvelope(response))
-	ErrorHandler(err)
+	errorhandler.ErrorHandler(err)
 
 	return js
 }
 
-func setupResponse(w *http.ResponseWriter, req *http.Request) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-}
-
-func Login(w http.ResponseWriter, r *http.Request) {
-	authorization := r.Header.Get("Authorization")
-	fmt.Println(authorization)
-	http.Error(w, "authorization failed", http.StatusUnauthorized)
-}
-
 // GetPost returns all entries
 func GetPost(w http.ResponseWriter, r *http.Request) {
-	setupResponse(&w, r)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(buildResponse())
 }
@@ -85,7 +73,7 @@ func GetLandingPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	t, err := template.ParseFiles("./templates/index.html")
-	ErrorHandler(err)
+	errorhandler.ErrorHandler(err)
 
 	t.Execute(w, nil)
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -33,6 +34,10 @@ func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 
 		h.ServeHTTP(w, r)
 	}
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("yay")
 }
 
 func Use(h http.HandlerFunc, middleware ...func(http.HandlerFunc) http.HandlerFunc) http.HandlerFunc {
