@@ -5,7 +5,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	api "milpost.ch/http"
+	"milpost.ch/errorhandler"
+	router "milpost.ch/router"
 )
 
 type environment struct {
@@ -15,9 +16,9 @@ type environment struct {
 
 func main() {
 	err := godotenv.Load()
-	api.ErrorHandler(err)
+	errorhandler.ErrorHandler(err)
 
 	fmt.Println("Server listening on Port", os.Getenv("port"))
 
-	api.HandleHTTP(os.Getenv("port"))
+	router.HandleHTTP(os.Getenv("port"))
 }
