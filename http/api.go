@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"text/template"
 	"time"
@@ -48,6 +49,11 @@ func buildResponse() []byte {
 	ErrorHandler(err)
 
 	return js
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	authorization := r.Header.Get("Authorization")
+	fmt.Println(authorization)
 }
 
 // GetPost returns all entries
