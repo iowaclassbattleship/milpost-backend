@@ -20,7 +20,7 @@ func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 
 		if "user" != user || "pass" != pass || isOk == false {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
-			errorhandler.JSONError(w, errorhandler.JSONErrorModel{"Unauthorized"}, http.StatusUnauthorized)
+			errorhandler.JSONError(w, errorhandler.JSONErrorModel{errorhandler.Unauthorized}, http.StatusUnauthorized)
 			return
 		}
 
@@ -36,7 +36,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	})
 	tokenString, err := token.SignedString([]byte("123"))
 	if errorhandler.IsError(err) == true {
-		errorhandler.JSONError(w, errorhandler.JSONErrorModel{"TOKEN_GENERATION_FAILED"}, http.StatusInternalServerError)
+		errorhandler.JSONError(w, errorhandler.JSONErrorModel{errorhandler.TokenGenerationFailed}, http.StatusInternalServerError)
 		return
 	}
 
