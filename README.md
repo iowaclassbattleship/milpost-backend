@@ -4,7 +4,49 @@
 This project contains the backend of the post app, below a deployment guide
 can be found and the requirements for this project
 
-- [milpost-backend](#milpost-backend)
+- [Milpost Backend](#milpost-backend)
+  - [Deployment](#deployment)
+    - [Building and running api docker](#building-and-running-api-docker)
+  - [Requirements](#requirements)
+    - [Terminology](#terminology)
+    - [Specification](#specification)
+      - [TLDR](#tldr)
+    - [Functionality](#functionality)
+
+## Deployment
+
+This section will outline the steps to deploy the api and mongo database. Both
+use a seperate docker file as specified in the `Dockerfile.api` and
+`Dockerfile.db` for the api and database (mongo) respectivielty. To be able to
+deploy this you must have docker installed, find the tutorial to install it 
+[here](https://docs.docker.com/install/linux/docker-ce/debian/).
+
+### Building and running api docker
+
+First step is building the image with the correct docker file. Here `-t` refers
+to the tag and `-f` refers to the docker file to be used, as we have multiple
+here it must be specified. It is important that when executing this command you
+are in the root directory of this project.
+
+```bash
+docker image build -t milpost-api:<version> -f Dockerfile.api .
+docker image build -t milpost-api:0.1.0 -f Dockerfile.api .      # Example
+```
+
+Once the docker image finishes building it is very easy to run the image with
+the following command.
+
+``` bash
+docker container run -p 8080:8080 --detach --name api milpost-api:<version>
+docker container run -p 8080:8080 --detach --name api milpost-api:0.1.0      # Example
+```
+
+Finally when you have finished or want to spin down the docker container use
+the following command.
+
+``` bash
+docker container rm --force api
+```
 
 ## Requirements
 
@@ -78,8 +120,7 @@ The admin users should be able to:
 
 Ideally there are two possible print outs for the `post list`, one to display
 and one to be used by the admin to collect signatures from the recievers. The
-minimum columns for the admin list are as follows:
-
+minimum columns for the admin listhttps://docs.docker.com/install/linux/docker-ce/debian/
 - Rank
 - Name
 - Signature (To be filled in)
