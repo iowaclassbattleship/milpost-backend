@@ -11,8 +11,8 @@ import (
 func HandleHTTP(port string) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/login", Login).Methods("POST")
-	router.HandleFunc("/post", GetPost).Methods("GET")
+	router.HandleFunc("/login", Login).Methods("OPTIONS", "POST")
+	router.HandleFunc("/post", GetPost).Methods("OPTIONS", "GET")
 
 	router.HandleFunc("/post/{id}", CreatePostEntry).Methods("POST")
 	router.HandleFunc("/post/{id}", DeletePostEntry).Methods("DELETE")
