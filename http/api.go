@@ -58,6 +58,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 // GetPost returns all entries
 func GetPost(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(buildResponse())
 }
