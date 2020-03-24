@@ -14,7 +14,9 @@ type environment struct {
 }
 
 func main() {
-	env := godotenv.Load()
+	err := godotenv.Load()
+	api.ErrorHandler(err)
+
 	fmt.Println("Server listening on Port", os.Getenv("port"))
 
 	api.HandleHTTP(os.Getenv("port"))
