@@ -1,17 +1,18 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
+
+	"milpost.ch/errorhandler"
 )
 
-func basicAuth(h http.Handler) http.Handler {
+func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, pass, _ := r.BasicAuth()
+		user, pass, isOk := r.BasicAuth()
 
-		if "user" != user || "pass" != pass {
+		if "user" != user || "pass" != pass || isOk == false {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
-			http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+			errorhandler.JSONError(w, errorhandler.JSONErrorModel{"Unauthorized"}, http.StatusUnauthorized)
 			return
 		}
 
@@ -20,13 +21,6 @@ func basicAuth(h http.Handler) http.Handler {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("yay")
-}
-
-func Use(h http.HandlerFunc, middleware ...func(http.HandlerFunc) http.HandlerFunc) http.HandlerFunc {
-	for _, m := range middleware {
-		h = m(h)
-	}
-
-	return h
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("hello"))
 }

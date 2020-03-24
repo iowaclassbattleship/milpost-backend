@@ -6,7 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"milpost.ch/errorhandler"
-	router "milpost.ch/http"
+	router "milpost.ch/router"
 )
 
 type environment struct {
