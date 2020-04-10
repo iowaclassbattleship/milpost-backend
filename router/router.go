@@ -17,10 +17,10 @@ var allowedOrigins = handlers.AllowedOrigins([]string{
 func HandleHTTP(port string) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/login", auth.Post(auth.BasicAuth(auth.Login)))
+	router.HandleFunc("/login", auth.Method("POST", auth.BasicAuth(auth.Login)))
 	router.HandleFunc("/post", api.GetPost).Methods("OPTIONS", "GET")
 
-	router.HandleFunc("/post/{id}", api.CreatePostEntry).Methods("POST")
+	router.HandleFunc("/post/{id}", auth.Method("GET", auth.JWTAuth(api.CreatePostEntry)))
 	router.HandleFunc("/post/{id}", api.DeletePostEntry).Methods("DELETE")
 
 	router.HandleFunc("/", api.GetLandingPage).Methods("GET")
