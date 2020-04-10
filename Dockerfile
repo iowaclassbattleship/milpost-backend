@@ -5,5 +5,5 @@ WORKDIR /usr/src/milpost
 COPY . .
 RUN go get ./...
 
-Run go build
+RUN go build
 CMD ["./server"]
