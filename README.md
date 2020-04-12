@@ -1,4 +1,3 @@
-
 # Milpost Backend
 
 This project contains the backend of the post app, below a deployment guide

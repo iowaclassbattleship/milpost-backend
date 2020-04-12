@@ -1,12 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
-	api "milpost.ch/http"
+	"github.com/joho/godotenv"
+	"milpost.ch/errorhandler"
+	router "milpost.ch/router"
 )
 
 type environment struct {
@@ -15,21 +15,10 @@ type environment struct {
 }
 
 func main() {
-	env := readEnvironment()
-	fmt.Println("Server listening on Port", env.Port)
+	err := godotenv.Load()
+	errorhandler.ErrorHandler(err)
 
-	api.HandleHTTP(env.Port, env.URI)
-}
+	fmt.Println("Server listening on Port", os.Getenv("port"))
 
-func readEnvironment() environment {
-	jsonFile, err := os.Open("./config/environment.json")
-	api.ErrorHandler(err)
-
-	bytes, _ := ioutil.ReadAll(jsonFile)
-
-	var data environment
-
-	json.Unmarshal(bytes, &data)
-
-	return data
+	router.HandleHTTP(os.Getenv("port"))
 }
