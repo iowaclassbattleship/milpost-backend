@@ -1,7 +1,7 @@
 # Milpost Backend
 
-This project contains the backend of the post app, below a deployment guide
-can be found and the requirements for this project
+This project contains the backend of the Milpost app, below a deployment guide
+can be found and the requirements for this project.
 
 - [Milpost Backend](#milpost-backend)
   - [Deployment](#deployment)
