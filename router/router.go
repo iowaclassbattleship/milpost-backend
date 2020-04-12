@@ -11,7 +11,12 @@ import (
 )
 
 var allowedOrigins = handlers.AllowedOrigins([]string{
-	"http://localhost:4200"})
+	"*"})
+var allowedHeaders = handlers.AllowedHeaders([]string{
+	"Access-Control-Allow-Origin", "X-Requested-With", "Content-Type", "Authorization"})
+
+var allowedMethods = handlers.AllowedMethods([]string{
+	"GET", "POST", "PUT", "HEAD", "OPTIONS"})
 
 var allowedMethods = handlers.AllowedMethods([]string{
 	"OPTIONS",
@@ -33,5 +38,5 @@ func HandleHTTP(port string) {
 
 	router.HandleFunc("/", api.GetLandingPage).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(allowedOrigins)(router)))
+	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(allowedOrigins, allowedHeaders, allowedMethods)(router)))
 }
