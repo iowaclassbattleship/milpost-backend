@@ -43,20 +43,12 @@ func JWTAuth(h http.HandlerFunc) http.HandlerFunc {
 		a = strings.Replace(a, "Bearer ", "", 1)
 
 		cl := &claims{}
-		tkn, err := jwt.ParseWithClaims(a, cl, func(token *jwt.Token) (interface{}, error) {
+		_, err := jwt.ParseWithClaims(a, cl, func(token *jwt.Token) (interface{}, error) {
 			return getPublicKey(), nil
 		})
 		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			fmt.Print(err.Error())
 			w.WriteHeader(http.StatusBadRequest)
 			return
-		}
-		if !tkn.Valid {
-			fmt.Print("invalid token")
 		}
 
 		fmt.Print(cl.Username)
@@ -86,10 +78,12 @@ func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPrivateKey() *rsa.PrivateKey {
-	privateKeyBytes, err := ioutil.ReadFile("auth/keys/milpost-private.pem")
+	privateKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.pem")
+	fmt.Print("hruhourhg")
 	errorhandler.Fatal(err)
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
+	fmt.Print("fuck")
 	errorhandler.Fatal(err)
 
 	fmt.Print(privateKey)
@@ -98,7 +92,7 @@ func getPrivateKey() *rsa.PrivateKey {
 }
 
 func getPublicKey() *rsa.PublicKey {
-	publicKeyBytes, err := ioutil.ReadFile("auth/keys/milpost-public.pem.pub")
+	publicKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.pub.pem")
 	errorhandler.Fatal(err)
 
 	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
