@@ -44,13 +44,14 @@ func JWTAuth(h http.HandlerFunc) http.HandlerFunc {
 
 		cl := &claims{}
 		tkn, err := jwt.ParseWithClaims(a, cl, func(token *jwt.Token) (interface{}, error) {
-			return []byte("1234"), nil
+			return getPublicKey(), nil
 		})
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
+			fmt.Print(err.Error())
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -65,33 +66,39 @@ func JWTAuth(h http.HandlerFunc) http.HandlerFunc {
 }
 
 func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"exp": time.Now().Add(45 * time.Minute).Unix(),
-		"iat": time.Now().Unix(),
-	})
+	cl := claims{
+		"Yolo",
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+	}
 
-	tokenString, err := token.SignedString(getPrivateKey())
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, cl)
+	ss, err := token.SignedString(getPrivateKey())
 	if errorhandler.IsError(err) == true {
 		errorhandler.JSONError(w, errorhandler.JSONErrorModel{Error: errorhandler.TokenGenerationFailed}, http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tokenResult{tokenString})
+	json.NewEncoder(w).Encode(tokenResult{ss})
 }
 
 func getPrivateKey() *rsa.PrivateKey {
-	privateKeyByes, err := ioutil.ReadFile("auth/keys/milpost.rsa")
+	privateKeyBytes, err := ioutil.ReadFile("auth/keys/milpost-private.pem")
 	errorhandler.Fatal(err)
 
-	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyByes)
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
 	errorhandler.Fatal(err)
+
+	fmt.Print(privateKey)
 
 	return privateKey
 }
 
 func getPublicKey() *rsa.PublicKey {
-	publicKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.rsa.pub")
+	publicKeyBytes, err := ioutil.ReadFile("auth/keys/milpost-public.pem.pub")
 	errorhandler.Fatal(err)
 
 	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)

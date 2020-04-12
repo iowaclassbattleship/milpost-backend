@@ -12,11 +12,9 @@ import (
 
 var allowedOrigins = handlers.AllowedOrigins([]string{
 	"*"})
+
 var allowedHeaders = handlers.AllowedHeaders([]string{
 	"Access-Control-Allow-Origin", "X-Requested-With", "Content-Type", "Authorization"})
-
-var allowedMethods = handlers.AllowedMethods([]string{
-	"GET", "POST", "PUT", "HEAD", "OPTIONS"})
 
 var allowedMethods = handlers.AllowedMethods([]string{
 	"OPTIONS",
