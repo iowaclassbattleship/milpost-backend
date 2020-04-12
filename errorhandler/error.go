@@ -2,6 +2,7 @@ package errorhandler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -13,6 +14,12 @@ type JSONErrorModel struct {
 func ErrorHandler(err error) {
 	if err != nil {
 		panic(err)
+	}
+}
+
+func Fatal(err error) {
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 

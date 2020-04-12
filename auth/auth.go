@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"crypto/rsa"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -20,10 +22,6 @@ type claims struct {
 	Username string `json:"user"`
 	jwt.StandardClaims
 }
-
-const (
-	KEY = "123"
-)
 
 func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -66,16 +64,13 @@ func JWTAuth(h http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
-	expiration := time.Now().Add(45 * time.Minute).Unix()
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user": "yuppie",
-		"exp":  expiration,
-		"iat":  time.Now().Unix(),
+func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+		"exp": time.Now().Add(45 * time.Minute).Unix(),
+		"iat": time.Now().Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte(KEY))
+	tokenString, err := token.SignedString(getPrivateKey())
 	if errorhandler.IsError(err) == true {
 		errorhandler.JSONError(w, errorhandler.JSONErrorModel{Error: errorhandler.TokenGenerationFailed}, http.StatusInternalServerError)
 		return
@@ -83,4 +78,24 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(tokenResult{tokenString})
+}
+
+func getPrivateKey() *rsa.PrivateKey {
+	privateKeyByes, err := ioutil.ReadFile("auth/keys/milpost.rsa")
+	errorhandler.Fatal(err)
+
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyByes)
+	errorhandler.Fatal(err)
+
+	return privateKey
+}
+
+func getPublicKey() *rsa.PublicKey {
+	publicKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.rsa.pub")
+	errorhandler.Fatal(err)
+
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
+	errorhandler.Fatal(err)
+
+	return publicKey
 }

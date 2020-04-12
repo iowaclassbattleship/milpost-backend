@@ -13,15 +13,23 @@ import (
 var allowedOrigins = handlers.AllowedOrigins([]string{
 	"http://localhost:4200"})
 
+var allowedMethods = handlers.AllowedMethods([]string{
+	"OPTIONS",
+	"GET",
+	"POST",
+	"DELETE"})
+
 // HandleHTTP Function
 func HandleHTTP(port string) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/login", auth.Method("POST", auth.BasicAuth(auth.Login)))
-	router.HandleFunc("/post", api.GetPost).Methods("OPTIONS", "GET")
+	router.HandleFunc("/login", auth.BasicAuth(auth.GetJWTRS256)).Methods("POST")
 
-	router.HandleFunc("/post/{id}", auth.Method("GET", auth.JWTAuth(api.CreatePostEntry)))
-	router.HandleFunc("/post/{id}", api.DeletePostEntry).Methods("DELETE")
+	router.HandleFunc("/post", api.GetPost).Methods("GET")
+
+	router.HandleFunc("/post/{id}", auth.JWTAuth(api.CreatePostEntry)).Methods("POST")
+	router.HandleFunc("/post/{id}", auth.JWTAuth(api.CreatePostEntry)).Methods("GET")
+	router.HandleFunc("/post/{id}", auth.JWTAuth(api.DeletePostEntry)).Methods("DELETE")
 
 	router.HandleFunc("/", api.GetLandingPage).Methods("GET")
 
