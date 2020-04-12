@@ -60,7 +60,7 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 
 // CreatePostEntry creates a new entry in the database and returns an id
 func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusInternalServerError)
+	w.Write([]byte("hfhfhfh"))
 }
 
 // DeletePostEntry deletes an entry in the database

@@ -18,15 +18,23 @@ var allowedHeaders = handlers.AllowedHeaders([]string{
 var allowedMethods = handlers.AllowedMethods([]string{
 	"GET", "POST", "PUT", "HEAD", "OPTIONS"})
 
+var allowedMethods = handlers.AllowedMethods([]string{
+	"OPTIONS",
+	"GET",
+	"POST",
+	"DELETE"})
+
 // HandleHTTP Function
 func HandleHTTP(port string) {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/login", auth.Login)
-	router.HandleFunc("/post", api.GetPost).Methods("OPTION", "GET")
+	router.HandleFunc("/login", auth.BasicAuth(auth.GetJWTRS256)).Methods("POST")
 
-	router.HandleFunc("/post/{id}", api.CreatePostEntry).Methods("POST")
-	router.HandleFunc("/post/{id}", api.DeletePostEntry).Methods("DELETE")
+	router.HandleFunc("/post", api.GetPost).Methods("GET")
+
+	router.HandleFunc("/post/{id}", auth.JWTAuth(api.CreatePostEntry)).Methods("POST")
+	router.HandleFunc("/post/{id}", auth.JWTAuth(api.CreatePostEntry)).Methods("GET")
+	router.HandleFunc("/post/{id}", auth.JWTAuth(api.DeletePostEntry)).Methods("DELETE")
 
 	router.HandleFunc("/", api.GetLandingPage).Methods("GET")
 
