@@ -1,66 +1,63 @@
 package db
 
 import (
-	"database/sql"
-	"fmt"
 	"os"
 
 	"milpost.ch/errorhandler"
+	"milpost.ch/model"
 
 	_ "github.com/go-sql-driver/mysql"
+	gorm "github.com/jinzhu/gorm"
 )
+
+type Post struct {
+	gorm.Model
+	Grade    string
+	Name     string
+	Company  string
+	Section  string
+	ItemType uint8
+}
 
 func CreateTable() {
 	db := dbConn()
+	defer db.Close()
 
-	_, err := db.Query(`CREATE TABLE IF NOT EXISTS post (
-		post_id INT NOT NULL AUTO_INCREMENT,
-		grade varchar(32),
-		name varchar(128) not null,
-		company varchar(32),
-		section varchar(32),
-		itemType BIT(1) not null,
-		timestamp TIMESTAMP not null,
-		CONSTRAINT post_pk PRIMARY KEY (post_id)
-		)`)
-	errorhandler.Fatal(err)
+	db.AutoMigrate(&Post{})
 }
 
 func DummyData() {
 	db := dbConn()
+	defer db.Close()
 
-	_, err := db.Query(`INSERT INTO post (grade, name, company, section, itemType) VALUES(
-		("Lieutenant",
-		"Muerner",
-		"Fickschnitzel",
-		"fart",
-		1)
-	)`)
-	errorhandler.Fatal(err)
+	post := Post{Grade: "Fartface", Name: "Fart", Company: "hdhf", Section: "hfh", ItemType: 1}
+
+	db.NewRecord(post)
+
+	db.Create(&post)
 }
 
-func Select() {
+func InsertPost(post model.Post) {
 	db := dbConn()
-
-	res, err := db.Query(`SELECT * FROM POST`)
-	errorhandler.Fatal(err)
-
-	fmt.Print(res)
+	defer db.Close()
 }
 
 func GetPost() {
 	db := dbConn()
-	fmt.Print(db)
+	defer db.Close()
 
-	// res, err := db.Query("SELECT * FROM post")
-
+	var post Post
+	db.Find(&post)
 }
 
-func CreatePost() {
+func DeletePost(id int) {
+	db := dbConn()
+	defer db.Close()
 
+	db.Where("id = ?", id).Delete(&Post{})
 }
 
-func dbConn() (db *sql.DB) {
+func dbConn() (db *gorm.DB) {
 	dialect := os.Getenv("dialect")
 	dbUser := os.Getenv("dbUser")
 	dbPw := os.Getenv("dbPw")
@@ -68,7 +65,7 @@ func dbConn() (db *sql.DB) {
 	dbPort := os.Getenv("dbPort")
 	dbSub := os.Getenv("dbSub")
 
-	conn, err := sql.Open(dialect, dbUser+":"+dbPw+"@tcp("+dbName+":"+dbPort+")/"+dbSub)
+	conn, err := gorm.Open(dialect, dbUser+":"+dbPw+"@tcp("+dbName+":"+dbPort+")/"+dbSub+"?parseTime=true")
 	errorhandler.Fatal(err)
 
 	return conn

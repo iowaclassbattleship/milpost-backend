@@ -31,7 +31,6 @@ func HandleHTTP(port string) {
 	router.HandleFunc("/post", api.GetPost).Methods("GET")
 
 	router.HandleFunc("/post/{id}", auth.JWTAuth(api.CreatePostEntry)).Methods("POST")
-	router.HandleFunc("/post/{id}", auth.JWTAuth(api.CreatePostEntry)).Methods("GET")
 	router.HandleFunc("/post/{id}", auth.JWTAuth(api.DeletePostEntry)).Methods("DELETE")
 
 	router.HandleFunc("/", api.GetLandingPage).Methods("GET")

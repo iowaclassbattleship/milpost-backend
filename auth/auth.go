@@ -47,24 +47,23 @@ func JWTAuth(h http.HandlerFunc) http.HandlerFunc {
 			return getPublicKey(), nil
 		})
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			errorhandler.JSONError(w, errorhandler.JSONErrorModel{Error: errorhandler.Unauthorized}, http.StatusUnauthorized)
 			return
 		}
-
-		fmt.Print(cl.Username)
-
 		h.ServeHTTP(w, r)
 	})
 }
 
 func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
+	user, _, _ := r.BasicAuth()
 	cl := claims{
-		"Yolo",
+		user,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
+	fmt.Print(user)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, cl)
 	ss, err := token.SignedString(getPrivateKey())

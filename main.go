@@ -21,7 +21,6 @@ func main() {
 
 	db.CreateTable()
 	db.DummyData()
-	db.Select()
 
 	fmt.Println("Server listening on Port", os.Getenv("port"))
 

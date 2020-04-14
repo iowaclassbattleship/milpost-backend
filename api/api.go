@@ -6,7 +6,9 @@ import (
 	"text/template"
 	"time"
 
+	"milpost.ch/db"
 	errorhandler "milpost.ch/errorhandler"
+	"milpost.ch/model"
 )
 
 type envelope struct {
@@ -14,8 +16,8 @@ type envelope struct {
 }
 
 type result struct {
-	Meta meta   `json:"meta"`
-	Data []post `json:"post"`
+	Meta meta         `json:"meta"`
+	Data []model.Post `json:"post"`
 }
 
 type meta struct {
@@ -23,27 +25,16 @@ type meta struct {
 	Time       time.Time `json:"time"`
 }
 
-type post struct {
-	ID        int    `json:"id"`
-	Company   string `json:"company"`
-	Section   string `json:"section"`
-	Grade     string `json:"grade"`
-	Name      string `json:"name"`
-	ItemType  int    `json:"itemType"`
-	Timestamp string `json:"timeStamp"`
-}
-
 func buildResponse() []byte {
-	var response []post
+	var response []model.Post
 	for i := 0; i < 5; i++ {
-		response = append(response, post{
-			1,
+		response = append(response, model.Post{
 			"Charlie",
 			"Ambos",
 			"General",
 			"Fishman",
 			2,
-			"2019-04-03"})
+		})
 	}
 
 	js, err := json.Marshal(buildResponseEnvelope(response))
@@ -60,7 +51,11 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 
 // CreatePostEntry creates a new entry in the database and returns an id
 func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("hfhfhfh"))
+	var p model.Post
+	err := json.NewDecoder(r.Body).Decode(&p)
+	errorhandler.Fatal(err)
+
+	db.InsertPost(p)
 }
 
 // DeletePostEntry deletes an entry in the database
@@ -78,6 +73,6 @@ func GetLandingPage(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, nil)
 }
 
-func buildResponseEnvelope(response []post) envelope {
+func buildResponseEnvelope(response []model.Post) envelope {
 	return envelope{result{meta{200, time.Now()}, response}}
 }
