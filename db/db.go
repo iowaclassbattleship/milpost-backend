@@ -10,11 +10,13 @@ import (
 	gorm "github.com/jinzhu/gorm"
 )
 
-func CreateTable() {
+func CreateTable() error {
 	db := dbConn()
 	defer db.Close()
 
 	db.AutoMigrate(&model.Post{})
+
+	return nil
 }
 
 func DummyData() {
@@ -31,6 +33,9 @@ func DummyData() {
 func InsertPost(post model.Post) {
 	db := dbConn()
 	defer db.Close()
+
+	db.NewRecord(post)
+	db.Create(&post)
 }
 
 func GetPost() ([]model.Post, error) {
@@ -43,11 +48,13 @@ func GetPost() ([]model.Post, error) {
 	return post, nil
 }
 
-func DeletePost(id int) {
+func DeletePost(id int) error {
 	db := dbConn()
 	defer db.Close()
 
 	db.Where("id = ?", id).Delete(&model.Post{})
+
+	return nil
 }
 
 func dbConn() (db *gorm.DB) {

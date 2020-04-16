@@ -46,7 +46,6 @@ func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
 	var p model.Post
 	err := json.NewDecoder(r.Body).Decode(&p)
 	errors.ErrorHandlerInternal(w, err, errors.InternalServerError, http.StatusInternalServerError)
-	errors.Fatal(err)
 
 	db.InsertPost(p)
 }

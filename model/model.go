@@ -9,5 +9,5 @@ type Post struct {
 	Company   string    `gorm:"type:varchar(32)" json:"company"`
 	Section   string    `gorm:"type:varchar(32)" json:"section"`
 	ItemType  int       `gorm:"type:bit(1)" json:"itemType"`
-	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
+	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 }
