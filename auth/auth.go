@@ -46,10 +46,7 @@ func JWTAuth(h http.HandlerFunc) http.HandlerFunc {
 		_, err := jwt.ParseWithClaims(a, cl, func(token *jwt.Token) (interface{}, error) {
 			return getPublicKey(), nil
 		})
-		if err != nil {
-			errors.JSONError(w, errors.JSONErrorModel{Error: errors.Unauthorized}, http.StatusUnauthorized)
-			return
-		}
+		errors.ErrorHandlerInternal(w, err, errors.Unauthorized, http.StatusUnauthorized)
 		h.ServeHTTP(w, r)
 	})
 }
@@ -67,10 +64,7 @@ func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, cl)
 	ss, err := token.SignedString(getPrivateKey())
-	if errors.IsError(err) == true {
-		errors.JSONError(w, errors.JSONErrorModel{Error: errors.TokenGenerationFailed}, http.StatusInternalServerError)
-		return
-	}
+	errors.ErrorHandlerInternal(w, err, errors.TokenGenerationFailed, http.StatusInternalServerError)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(tokenResult{ss})

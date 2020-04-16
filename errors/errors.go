@@ -16,11 +16,10 @@ func Fatal(err error) {
 	}
 }
 
-func IsError(err error) bool {
+func ErrorHandlerInternal(w http.ResponseWriter, err error, message string, status int) {
 	if err != nil {
-		return true
+		JSONError(w, JSONErrorModel{Error: message}, status)
 	}
-	return false
 }
 
 func JSONError(w http.ResponseWriter, err JSONErrorModel, code int) {

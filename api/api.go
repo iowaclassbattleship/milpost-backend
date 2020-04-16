@@ -3,9 +3,11 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"text/template"
 	"time"
 
+	"github.com/gorilla/mux"
 	"milpost.ch/db"
 	errors "milpost.ch/errors"
 	"milpost.ch/model"
@@ -34,9 +36,7 @@ func buildResponse(response []model.Post) []byte {
 // GetPost returns all entries
 func GetPost(w http.ResponseWriter, r *http.Request) {
 	post, err := db.GetPost()
-	if errors.IsError(err) {
-		errors.JSONError(w, errors.JSONErrorModel{Error: errors.InternalServerError}, http.StatusInternalServerError)
-	}
+	errors.ErrorHandlerInternal(w, err, errors.InternalServerError, http.StatusInternalServerError)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(buildResponse(post))
 }
@@ -45,6 +45,7 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
 	var p model.Post
 	err := json.NewDecoder(r.Body).Decode(&p)
+	errors.ErrorHandlerInternal(w, err, errors.InternalServerError, http.StatusInternalServerError)
 	errors.Fatal(err)
 
 	db.InsertPost(p)
@@ -52,7 +53,10 @@ func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
 
 // DeletePostEntry deletes an entry in the database
 func DeletePostEntry(w http.ResponseWriter, r *http.Request) {
-	http.StatusText(404)
+	idString := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idString)
+	errors.ErrorHandlerInternal(w, err, errors.InternalServerError, http.StatusInternalServerError)
+	db.DeletePost(id)
 }
 
 // GetLandingPage returns a html file welcoming the user
@@ -60,9 +64,7 @@ func GetLandingPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	t, err := template.ParseFiles("./templates/index.html")
-	if errors.IsError(err) == false {
-		errors.JSONError(w, errors.JSONErrorModel{Error: errors.InternalServerError}, http.StatusInternalServerError)
-	}
+	errors.ErrorHandlerInternal(w, err, errors.InternalServerError, http.StatusInternalServerError)
 
 	t.Execute(w, nil)
 }
