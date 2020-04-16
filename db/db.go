@@ -30,12 +30,14 @@ func DummyData() {
 	db.Create(&post)
 }
 
-func InsertPost(post model.Post) {
+func InsertPost(post model.Post) error {
 	db := dbConn()
 	defer db.Close()
 
 	db.NewRecord(post)
 	db.Create(&post)
+
+	return nil
 }
 
 func GetPost() ([]model.Post, error) {

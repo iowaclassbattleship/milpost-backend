@@ -47,7 +47,8 @@ func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&p)
 	errors.ErrorHandlerInternal(w, err, errors.InternalServerError, http.StatusInternalServerError)
 
-	db.InsertPost(p)
+	insertionError := db.InsertPost(p)
+	errors.ErrorHandlerInternal(w, insertionError, errors.InvalidInput, http.StatusBadRequest)
 }
 
 // DeletePostEntry deletes an entry in the database
