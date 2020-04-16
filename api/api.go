@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"milpost.ch/db"
-	errorhandler "milpost.ch/errorhandler"
+	errors "milpost.ch/errors"
 	"milpost.ch/model"
 )
 
@@ -25,35 +25,27 @@ type meta struct {
 	Time       time.Time `json:"time"`
 }
 
-func buildResponse() []byte {
-	var response []model.Post
-	for i := 0; i < 5; i++ {
-		response = append(response, model.Post{
-			"Charlie",
-			"Ambos",
-			"General",
-			"Fishman",
-			2,
-		})
-	}
-
-	js, err := json.Marshal(buildResponseEnvelope(response))
-	errorhandler.ErrorHandler(err)
+func buildResponse(response []model.Post) []byte {
+	js, _ := json.Marshal(buildResponseEnvelope(response))
 
 	return js
 }
 
 // GetPost returns all entries
 func GetPost(w http.ResponseWriter, r *http.Request) {
+	post, err := db.GetPost()
+	if errors.IsError(err) {
+		errors.JSONError(w, errors.JSONErrorModel{Error: errors.InternalServerError}, http.StatusInternalServerError)
+	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(buildResponse())
+	w.Write(buildResponse(post))
 }
 
 // CreatePostEntry creates a new entry in the database and returns an id
 func CreatePostEntry(w http.ResponseWriter, r *http.Request) {
 	var p model.Post
 	err := json.NewDecoder(r.Body).Decode(&p)
-	errorhandler.Fatal(err)
+	errors.Fatal(err)
 
 	db.InsertPost(p)
 }
@@ -68,7 +60,9 @@ func GetLandingPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	t, err := template.ParseFiles("./templates/index.html")
-	errorhandler.ErrorHandler(err)
+	if errors.IsError(err) == false {
+		errors.JSONError(w, errors.JSONErrorModel{Error: errors.InternalServerError}, http.StatusInternalServerError)
+	}
 
 	t.Execute(w, nil)
 }

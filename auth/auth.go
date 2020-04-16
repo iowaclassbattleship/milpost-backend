@@ -11,7 +11,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"milpost.ch/errorhandler"
+	"milpost.ch/errors"
 )
 
 type tokenResult struct {
@@ -29,7 +29,7 @@ func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 
 		if "user" != user || "pass" != pass || isOk == false {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
-			errorhandler.JSONError(w, errorhandler.JSONErrorModel{Error: errorhandler.Unauthorized}, http.StatusUnauthorized)
+			errors.JSONError(w, errors.JSONErrorModel{Error: errors.Unauthorized}, http.StatusUnauthorized)
 			return
 		}
 
@@ -47,7 +47,7 @@ func JWTAuth(h http.HandlerFunc) http.HandlerFunc {
 			return getPublicKey(), nil
 		})
 		if err != nil {
-			errorhandler.JSONError(w, errorhandler.JSONErrorModel{Error: errorhandler.Unauthorized}, http.StatusUnauthorized)
+			errors.JSONError(w, errors.JSONErrorModel{Error: errors.Unauthorized}, http.StatusUnauthorized)
 			return
 		}
 		h.ServeHTTP(w, r)
@@ -67,8 +67,8 @@ func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, cl)
 	ss, err := token.SignedString(getPrivateKey())
-	if errorhandler.IsError(err) == true {
-		errorhandler.JSONError(w, errorhandler.JSONErrorModel{Error: errorhandler.TokenGenerationFailed}, http.StatusInternalServerError)
+	if errors.IsError(err) == true {
+		errors.JSONError(w, errors.JSONErrorModel{Error: errors.TokenGenerationFailed}, http.StatusInternalServerError)
 		return
 	}
 
@@ -79,11 +79,11 @@ func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
 func getPrivateKey() *rsa.PrivateKey {
 	privateKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.pem")
 	fmt.Print("hruhourhg")
-	errorhandler.Fatal(err)
+	errors.Fatal(err)
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
 	fmt.Print("fuck")
-	errorhandler.Fatal(err)
+	errors.Fatal(err)
 
 	fmt.Print(privateKey)
 
@@ -92,10 +92,10 @@ func getPrivateKey() *rsa.PrivateKey {
 
 func getPublicKey() *rsa.PublicKey {
 	publicKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.pub.pem")
-	errorhandler.Fatal(err)
+	errors.Fatal(err)
 
 	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
-	errorhandler.Fatal(err)
+	errors.Fatal(err)
 
 	return publicKey
 }

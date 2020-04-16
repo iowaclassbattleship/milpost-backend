@@ -6,7 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 	db "milpost.ch/db"
-	"milpost.ch/errorhandler"
+	"milpost.ch/errors"
 	router "milpost.ch/router"
 )
 
@@ -17,8 +17,7 @@ type environment struct {
 
 func main() {
 	err := godotenv.Load()
-	errorhandler.ErrorHandler(err)
-
+	errors.Fatal(err)
 	db.CreateTable()
 	db.DummyData()
 

@@ -1,4 +1,4 @@
-package errorhandler
+package errors
 
 const (
 	Unauthorized          = "ERR_UNAUTHORIZED"

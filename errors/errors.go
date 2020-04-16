@@ -1,4 +1,4 @@
-package errorhandler
+package errors
 
 import (
 	"encoding/json"
@@ -8,13 +8,6 @@ import (
 
 type JSONErrorModel struct {
 	Error string `json:"error"`
-}
-
-// ErrorHandler checks, if an error occured
-func ErrorHandler(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
 
 func Fatal(err error) {
