@@ -19,7 +19,6 @@ func main() {
 	err := godotenv.Load()
 	errors.Fatal(err)
 	db.CreateTable()
-	db.DummyData()
 
 	fmt.Println("Server listening on Port", os.Getenv("port"))
 

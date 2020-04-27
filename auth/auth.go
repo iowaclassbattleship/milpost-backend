@@ -26,6 +26,7 @@ type claims struct {
 func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, isOk := r.BasicAuth()
+		fmt.Print(user, pass)
 
 		if "user" != user || "pass" != pass || isOk == false {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
@@ -60,7 +61,6 @@ func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
-	fmt.Print(user)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, cl)
 	ss, err := token.SignedString(getPrivateKey())
@@ -72,14 +72,10 @@ func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
 
 func getPrivateKey() *rsa.PrivateKey {
 	privateKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.pem")
-	fmt.Print("hruhourhg")
 	errors.Fatal(err)
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
-	fmt.Print("fuck")
 	errors.Fatal(err)
-
-	fmt.Print(privateKey)
 
 	return privateKey
 }

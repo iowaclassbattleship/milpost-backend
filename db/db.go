@@ -19,17 +19,6 @@ func CreateTable() error {
 	return nil
 }
 
-func DummyData() {
-	db := dbConn()
-	defer db.Close()
-
-	post := model.Post{Grade: "Fartface", Name: "Fart", Company: "hdhf", Section: "hfh", ItemType: 1}
-
-	db.NewRecord(post)
-
-	db.Create(&post)
-}
-
 func InsertPost(post model.Post) error {
 	db := dbConn()
 	defer db.Close()

@@ -12,6 +12,8 @@ import (
 
 var headersOk = handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 
+// var methodsOk = handlers.AllowedMethods([]string{"OPTIONS", "GET", "POST", "DELETE"})
+
 // HandleHTTP Function
 func HandleHTTP(port string) {
 	router := mux.NewRouter().StrictSlash(true)
