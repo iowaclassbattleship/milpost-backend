@@ -12,7 +12,7 @@ import (
 
 var headersOk = handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 
-// var methodsOk = handlers.AllowedMethods([]string{"OPTIONS", "GET", "POST", "DELETE"})
+var methodsOk = handlers.AllowedMethods([]string{"OPTIONS", "GET", "POST", "DELETE"})
 
 // HandleHTTP Function
 func HandleHTTP(port string) {
@@ -27,5 +27,5 @@ func HandleHTTP(port string) {
 
 	router.HandleFunc("/", api.GetLandingPage).Methods("GET")
 
-	http.ListenAndServe(":"+port, handlers.CORS(headersOk)(router))
+	http.ListenAndServe(":"+port, handlers.CORS(headersOk, methodsOk)(router))
 }
