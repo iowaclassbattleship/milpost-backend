@@ -1,26 +1,16 @@
 package router
 
 import (
-	"log"
 	"net/http"
+
+	"milpost.ch/api"
+	"milpost.ch/auth"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"milpost.ch/api"
-	"milpost.ch/auth"
 )
 
-var allowedOrigins = handlers.AllowedOrigins([]string{
-	"*"})
-
-var allowedHeaders = handlers.AllowedHeaders([]string{
-	"Access-Control-Allow-Origin", "X-Requested-With", "Content-Type", "Authorization"})
-
-var allowedMethods = handlers.AllowedMethods([]string{
-	"OPTIONS",
-	"GET",
-	"POST",
-	"DELETE"})
+var headersOk = handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 
 // HandleHTTP Function
 func HandleHTTP(port string) {
@@ -35,5 +25,5 @@ func HandleHTTP(port string) {
 
 	router.HandleFunc("/", api.GetLandingPage).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(allowedOrigins, allowedHeaders, allowedMethods)(router)))
+	http.ListenAndServe(":"+port, handlers.CORS(headersOk)(router))
 }

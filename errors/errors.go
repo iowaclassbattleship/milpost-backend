@@ -2,7 +2,7 @@ package errors
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 )
 
@@ -12,7 +12,7 @@ type JSONErrorModel struct {
 
 func Fatal(err error) {
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 }
 
