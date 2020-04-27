@@ -5,7 +5,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"milpost.ch/errorhandler"
+	db "milpost.ch/db"
+	"milpost.ch/errors"
 	router "milpost.ch/router"
 )
 
@@ -16,7 +17,8 @@ type environment struct {
 
 func main() {
 	err := godotenv.Load()
-	errorhandler.ErrorHandler(err)
+	errors.Fatal(err)
+	db.CreateTable()
 
 	fmt.Println("Server listening on Port", os.Getenv("port"))
 

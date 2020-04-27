@@ -11,7 +11,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"milpost.ch/errorhandler"
+	"milpost.ch/errors"
 )
 
 type tokenResult struct {
@@ -26,10 +26,11 @@ type claims struct {
 func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, isOk := r.BasicAuth()
+		fmt.Print(user, pass)
 
 		if "user" != user || "pass" != pass || isOk == false {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
-			errorhandler.JSONError(w, errorhandler.JSONErrorModel{Error: errorhandler.Unauthorized}, http.StatusUnauthorized)
+			errors.JSONError(w, errors.JSONErrorModel{Error: errors.Unauthorized}, http.StatusUnauthorized)
 			return
 		}
 
@@ -43,59 +44,48 @@ func JWTAuth(h http.HandlerFunc) http.HandlerFunc {
 		a = strings.Replace(a, "Bearer ", "", 1)
 
 		cl := &claims{}
-		tkn, err := jwt.ParseWithClaims(a, cl, func(token *jwt.Token) (interface{}, error) {
-			return []byte("1234"), nil
+		_, err := jwt.ParseWithClaims(a, cl, func(token *jwt.Token) (interface{}, error) {
+			return getPublicKey(), nil
 		})
-		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		if !tkn.Valid {
-			fmt.Print("invalid token")
-		}
-
-		fmt.Print(cl.Username)
-
+		errors.ErrorHandlerInternal(w, err, errors.Unauthorized, http.StatusUnauthorized)
 		h.ServeHTTP(w, r)
 	})
 }
 
 func GetJWTRS256(w http.ResponseWriter, r *http.Request) {
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"exp": time.Now().Add(45 * time.Minute).Unix(),
-		"iat": time.Now().Unix(),
-	})
-
-	tokenString, err := token.SignedString(getPrivateKey())
-	if errorhandler.IsError(err) == true {
-		errorhandler.JSONError(w, errorhandler.JSONErrorModel{Error: errorhandler.TokenGenerationFailed}, http.StatusInternalServerError)
-		return
+	user, _, _ := r.BasicAuth()
+	cl := claims{
+		user,
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
 	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, cl)
+	ss, err := token.SignedString(getPrivateKey())
+	errors.ErrorHandlerInternal(w, err, errors.TokenGenerationFailed, http.StatusInternalServerError)
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tokenResult{tokenString})
+	json.NewEncoder(w).Encode(tokenResult{ss})
 }
 
 func getPrivateKey() *rsa.PrivateKey {
-	privateKeyByes, err := ioutil.ReadFile("auth/keys/milpost.rsa")
-	errorhandler.Fatal(err)
+	privateKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.pem")
+	errors.Fatal(err)
 
-	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyByes)
-	errorhandler.Fatal(err)
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
+	errors.Fatal(err)
 
 	return privateKey
 }
 
 func getPublicKey() *rsa.PublicKey {
-	publicKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.rsa.pub")
-	errorhandler.Fatal(err)
+	publicKeyBytes, err := ioutil.ReadFile("auth/keys/milpost.pub.pem")
+	errors.Fatal(err)
 
 	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
-	errorhandler.Fatal(err)
+	errors.Fatal(err)
 
 	return publicKey
 }
